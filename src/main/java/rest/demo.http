@@ -35,7 +35,7 @@ POST http://localhost:8080/api/imagesFromApis/
 Content-Type: application/json
 
 {
-  "url": "https://nekos.best/api/v2/neko"
+  "url": "https://api.thecatapi.com/v1/images/search"
 }
 
 ###

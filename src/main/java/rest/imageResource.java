@@ -41,13 +41,18 @@ public class imageResource {
             return Response.status(400).entity(error).build();
         }
 
-        apiPictures imageDTO = gson.fromJson(res, apiPictures.class);
+        apiPictures imageDTO;
+        if (res.contains("[")) {
+            imageDTO = new Gson().fromJson(res, apiPictures[].class)[0];
+        } else {
+            imageDTO = gson.fromJson(res, apiPictures.class);
+        }
         String imageUrl = "";
-        if (imageDTO.getUrl() != null && imageDTO.getUrl().contains("jpg")) {
+        if (imageDTO.getUrl() != null && imageDTO.getUrl().contains("jpg") || imageDTO.getUrl().contains("gif")) {
             imageUrl = imageDTO.getUrl();
-        } else if (imageDTO.getImage() != null && imageDTO.getImage().contains("jpg")) {
+        } else if (imageDTO.getImage() != null && imageDTO.getImage().contains("jpg") || imageDTO.getUrl().contains("gif")) {
             imageUrl = imageDTO.getImage();
-        } else if (imageDTO.getFile() != null && imageDTO.getFile().contains("jpg")) {
+        } else if (imageDTO.getFile() != null && imageDTO.getFile().contains("jpg") || imageDTO.getUrl().contains("gif")) {
             imageUrl = imageDTO.getFile();
         } else {
             imageUrl = "Could not get image, might be chunked encoding (which this endpoint can't handle)";
