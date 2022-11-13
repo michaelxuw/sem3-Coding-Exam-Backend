@@ -20,3 +20,27 @@ Content-Type: application/json
 {
   "City": "Beijing"
 }
+
+
+###
+POST http://localhost:8080/api/imagesFromApis/
+Content-Type: application/json
+
+{
+  "url": "https://go-apod.herokuapp.com/apod"
+}
+
+###
+POST http://localhost:8080/api/imagesFromApis/
+Content-Type: application/json
+
+{
+  "url": "https://nekos.best/api/v2/neko"
+}
+
+###
+GET https://foodish-api.herokuapp.com/api
+
+###
+GET https://nekos.best/api/v2/nekod
+
