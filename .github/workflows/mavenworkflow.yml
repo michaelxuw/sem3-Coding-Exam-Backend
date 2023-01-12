@@ -1,8 +1,9 @@
 name: Github actions with maven build and deploy
-on: 
+on:
+  workflow_dispatch:
   push:
-    branches: 
-      - Master
+    branches:
+      - main
 jobs:
   Do-the-travis-thing:
     runs-on: ubuntu-20.04 #or ubuntu-latest
