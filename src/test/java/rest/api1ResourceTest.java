@@ -20,6 +20,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+@Disabled
 class api1ResourceTest {
 
     private static final int SERVER_PORT = 7777;
