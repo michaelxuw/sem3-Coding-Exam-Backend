@@ -131,8 +131,10 @@
                 <configuration>
                     <server>TomcatServer</server>
                     <url>${remote.server}</url>
+                    <!--suppress UnresolvedMavenProperty -->
                     <username>${remote.user}</username>
-                    <password>${remote.user}</password>
+                    <!--suppress UnresolvedMavenProperty -->
+                    <password>${remote.password}</password>
                     <update>true</update>
                 </configuration>
             </plugin>
