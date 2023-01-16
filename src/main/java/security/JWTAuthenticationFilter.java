@@ -78,16 +78,9 @@ public class JWTAuthenticationFilter implements ContainerRequestFilter {
             if (new Date().getTime() > signedJWT.getJWTClaimsSet().getExpirationTime().getTime()) {
                 throw new AuthenticationException("Your Token is no longer valid");
             }
-            String isAdmin = signedJWT.getJWTClaimsSet().getClaim("isAdmin").toString();
+            Permission permission = Permission.valueOf(signedJWT.getJWTClaimsSet().getClaim("pms").toString());
             String email = signedJWT.getJWTClaimsSet().getClaim("email").toString();
             String name = signedJWT.getJWTClaimsSet().getClaim("name").toString();
-            Permission permission;
-            System.out.println("isAdmin in jwt is: "+isAdmin);
-            if (isAdmin.equals("true")) {
-                permission = Permission.ADMIN;
-            } else {
-                permission = Permission.USER;
-            }
 
             return new AccountPrincipal(email, name, permission);
         } else {

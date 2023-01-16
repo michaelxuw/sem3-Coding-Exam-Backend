@@ -49,6 +49,17 @@ public class AccountFacade {
         return account;
     }
 
+    public Account createAccount(boolean isAdmin, String email, String userPass, String phone, String name) {
+
+        Account account = new Account(isAdmin, email, userPass, phone, name);
+
+        executeInsideTransaction(em -> {
+            em.persist(account);
+        });
+
+        return account;
+    }
+
 
 
 

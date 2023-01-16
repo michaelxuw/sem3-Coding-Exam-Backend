@@ -42,6 +42,8 @@ public class Account {
 
     //TODO Change when password is hashed
     public boolean verifyPassword(String pw){
+        System.out.println("pw is: "+pw);
+        System.out.println("password is: "+password);
         return BCrypt.checkpw(pw, password);
     }
 

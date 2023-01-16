@@ -58,7 +58,13 @@ public class LoginEndpoint {
         try {
             System.out.println("email is: "+email+" and pass is:"+password);
             Account account = ACCOUNT_FACADE.getVeryfiedAccount(email, password);
-            String token = createToken(account);
+            Permission permission;
+            if(account.getIsAdmin()) {
+                permission = Permission.ADMIN;
+            } else {
+                permission = Permission.USER;
+            }
+            String token = createToken(account, permission);
             JsonObject responseJson = new JsonObject();
             responseJson.addProperty("email", email);
             responseJson.addProperty("token", token);
@@ -73,7 +79,7 @@ public class LoginEndpoint {
         throw new AuthenticationException("Invalid email or password! Please try again");
     }
 
-    private String createToken(Account account) throws JOSEException {
+    private String createToken(Account account, Permission permission) throws JOSEException {
 
         StringBuilder res = new StringBuilder();
         String issuer = "semesterstartcode-dat3";
@@ -83,7 +89,7 @@ public class LoginEndpoint {
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .subject(account.getEmail())
                 .claim("ID", account.getId())
-                .claim("isAdmin", account.getIsAdmin())
+                .claim("pms", permission)
                 .claim("email", account.getEmail())
                 .claim("name", account.getName())
                 .claim("phone", account.getPhone())
