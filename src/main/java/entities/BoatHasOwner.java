@@ -10,7 +10,7 @@ public class BoatHasOwner {
 
     @MapsId("boatId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "boat_ID", nullable = false, referencedColumnName = "boat_ID")
+    @JoinColumn(name = "boat_ID", nullable = false)
     private Boat boat;
 
     @MapsId("ownerId")

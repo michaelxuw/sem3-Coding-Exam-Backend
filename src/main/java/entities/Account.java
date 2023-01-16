@@ -1,5 +1,7 @@
 package entities;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -12,13 +14,18 @@ public class Account {
     private Integer id;
 
     @NotNull
-    @Column(name = "isAdmin", nullable = false)
-    private Byte isAdmin;
+    @Column(name = "isAdmin", nullable = false, columnDefinition = "TINYINT(1)")
+    private boolean isAdmin;
 
     @Size(max = 45)
     @NotNull
     @Column(name = "email", nullable = false, length = 45)
     private String email;
+
+    @Size(max = 255)
+    @NotNull
+    @Column(name = "password", nullable = false, length = 255)
+    private String password;
 
     @Size(max = 45)
     @NotNull
@@ -30,10 +37,27 @@ public class Account {
     @Column(name = "name", nullable = false, length = 45)
     private String name;
 
-    @Size(max = 45)
-    @NotNull
-    @Column(name = "password", nullable = false, length = 45)
-    private String password;
+
+    public Account() {}
+
+    //TODO Change when password is hashed
+    public boolean verifyPassword(String pw){
+        return BCrypt.checkpw(pw, password);
+    }
+
+    public Account(String email, String userPass) {
+        this.email = email;
+        this.password = BCrypt.hashpw(userPass, BCrypt.gensalt());
+    }
+    public Account(boolean isAdmin, String email, String userPass, String phone, String name) {
+        this.isAdmin = isAdmin;
+        this.email = email;
+        this.password = BCrypt.hashpw(userPass, BCrypt.gensalt());
+        this.phone = phone;
+        this.name = name;
+    }
+
+
 
     public Integer getId() {
         return id;
@@ -43,11 +67,11 @@ public class Account {
         this.id = id;
     }
 
-    public Byte getIsAdmin() {
+    public boolean getIsAdmin() {
         return isAdmin;
     }
 
-    public void setIsAdmin(Byte isAdmin) {
+    public void setIsAdmin(boolean isAdmin) {
         this.isAdmin = isAdmin;
     }
 
@@ -57,6 +81,14 @@ public class Account {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getPhone() {
@@ -73,14 +105,6 @@ public class Account {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
 }

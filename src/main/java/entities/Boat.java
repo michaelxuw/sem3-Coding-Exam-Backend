@@ -8,13 +8,10 @@ import java.util.Set;
 
 @Entity
 public class Boat {
-    @EmbeddedId
-    private BoatId id;
-
-    @MapsId("harbourId")
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "harbour_ID", nullable = false)
-    private Harbour harbour;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "boat_ID", nullable = false)
+    private Integer id;
 
     @Size(max = 45)
     @NotNull
@@ -35,24 +32,21 @@ public class Boat {
     @Column(name = "image_link", length = 100)
     private String imageLink;
 
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "harbour_ID", nullable = false)
+    private Harbour harbour;
+
     @ManyToMany
     @JoinTable(name = "Boat_has_Owner", joinColumns = @JoinColumn(name = "boat_ID"), inverseJoinColumns = @JoinColumn(name = "owner_ID"))
     private Set<Owner> owners = new LinkedHashSet<>();
 
-    public BoatId getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(BoatId id) {
+    public void setId(Integer id) {
         this.id = id;
-    }
-
-    public Harbour getHarbour() {
-        return harbour;
-    }
-
-    public void setHarbour(Harbour harbour) {
-        this.harbour = harbour;
     }
 
     public String getBrand() {
@@ -85,6 +79,14 @@ public class Boat {
 
     public void setImageLink(String imageLink) {
         this.imageLink = imageLink;
+    }
+
+    public Harbour getHarbour() {
+        return harbour;
+    }
+
+    public void setHarbour(Harbour harbour) {
+        this.harbour = harbour;
     }
 
     public Set<Owner> getOwners() {

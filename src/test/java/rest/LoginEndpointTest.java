@@ -1,8 +1,6 @@
 package rest;
 
-import entities.User;
-import entities.Role;
-
+import entities.Account;
 import io.restassured.RestAssured;
 import static io.restassured.RestAssured.given;
 import io.restassured.http.ContentType;
@@ -18,11 +16,10 @@ import static org.hamcrest.Matchers.equalTo;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import utils.EMF_Creator;
 
-@Disabled
+//@Disabled
 public class LoginEndpointTest {
 
     private static final int SERVER_PORT = 7777;
@@ -66,23 +63,12 @@ public class LoginEndpointTest {
         try {
             em.getTransaction().begin();
             //Delete existing users and roles to get a "fresh" database
-            em.createQuery("delete from User").executeUpdate();
-            em.createQuery("delete from Role").executeUpdate();
+            em.createQuery("delete from Account").executeUpdate();
 
-            Role userRole = new Role("user");
-            Role adminRole = new Role("admin");
-            User user = new User("user", "test");
-            user.addRole(userRole);
-            User admin = new User("admin", "test");
-            admin.addRole(adminRole);
-            User both = new User("user_admin", "test");
-            both.addRole(userRole);
-            both.addRole(adminRole);
-            em.persist(userRole);
-            em.persist(adminRole);
+            Account user = new Account(false, "user", "test", "0001userPhone", "user1");
+            Account admin = new Account(true, "admin", "test", "1000adminPhone", "admin1");
             em.persist(user);
             em.persist(admin);
-            em.persist(both);
             //System.out.println("Saved test data to database");
             em.getTransaction().commit();
         } finally {
@@ -95,7 +81,7 @@ public class LoginEndpointTest {
 
     //Utility method to login and set the returned securityToken
     private static void login(String role, String password) {
-        String json = String.format("{username: \"%s\", password: \"%s\"}", role, password);
+        String json = String.format("{email: \"%s\", password: \"%s\"}", role, password);
         securityToken = given()
                 .contentType("application/json")
                 .body(json)
@@ -128,6 +114,7 @@ public class LoginEndpointTest {
     @Test
     public void testRestForAdmin() {
         login("admin", "test");
+        System.out.println("logged in");
         given()
                 .contentType("application/json")
                 .accept(ContentType.JSON)
@@ -161,41 +148,6 @@ public class LoginEndpointTest {
                 .statusCode(401);
     }
 
-    @Test
-    public void testAutorizedAdminCannotAccesUserPage() {
-        login("admin", "test");
-        given()
-                .contentType("application/json")
-                .header("x-access-token", securityToken)
-                .when()
-                .get("/info/user").then() //Call User endpoint as Admin
-                .statusCode(401);
-    }
-
-    @Test
-    public void testRestForMultiRole1() {
-        login("user_admin", "test");
-        given()
-                .contentType("application/json")
-                .accept(ContentType.JSON)
-                .header("x-access-token", securityToken)
-                .when()
-                .get("/info/admin").then()
-                .statusCode(200)
-                .body("msg", equalTo("Hello to (admin) User: user_admin"));
-    }
-
-    @Test
-    public void testRestForMultiRole2() {
-        login("user_admin", "test");
-        given()
-                .contentType("application/json")
-                .header("x-access-token", securityToken)
-                .when()
-                .get("/info/user").then()
-                .statusCode(200)
-                .body("msg", equalTo("Hello to User: user_admin"));
-    }
 
     @Test
     public void userNotAuthenticated() {
