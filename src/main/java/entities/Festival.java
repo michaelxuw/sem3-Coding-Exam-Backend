@@ -36,6 +36,9 @@ public class Festival {
     @OneToMany(mappedBy = "festival")
     private Set<Guest> guests = new LinkedHashSet<>();
 
+
+    public Festival() {
+    }
     public Festival(String name, String city, LocalDate startDate, String duration) {
         this.name = name;
         this.city = city;
