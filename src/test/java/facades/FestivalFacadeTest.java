@@ -53,6 +53,8 @@ public class FestivalFacadeTest {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
+            em.createNamedQuery("Account.deleteAllRows").executeUpdate();
+            em.createNamedQuery("Guest.deleteAllRows").executeUpdate();
             em.createNamedQuery("Festival.deleteAllRows").executeUpdate();
             festival = new Festival("test festival 1", "test city 1", LocalDate.now(), "1 days");
             em.persist(festival);
@@ -63,10 +65,8 @@ public class FestivalFacadeTest {
             em.persist(festival3);
 
 
-            em.createNamedQuery("Account.deleteAllRows").executeUpdate();
             Account user = new Account(false, "user", "test", "0001userPhone", "user1");
             em.persist(user);
-            em.createNamedQuery("Guest.deleteAllRows").executeUpdate();
             guest = new Guest("user1", "u1", "eu1", "Don't know?", user);
             guest.setFestival(festival);
             em.persist(guest);
