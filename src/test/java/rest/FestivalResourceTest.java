@@ -1,24 +1,30 @@
 package rest;
 
 import entities.Account;
+import entities.Festival;
 import io.restassured.RestAssured;
-import static io.restassured.RestAssured.given;
 import io.restassured.http.ContentType;
 import io.restassured.parsing.Parser;
-import java.net.URI;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.ws.rs.core.UriBuilder;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
-import static org.hamcrest.Matchers.equalTo;
-
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import utils.EMF_Creator;
 
-@Disabled
-public class LoginEndpointTest {
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.ws.rs.core.UriBuilder;
+import java.net.URI;
+import java.time.LocalDate;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
+
+//@Disabled
+public class FestivalResourceTest {
 
     private static final int SERVER_PORT = 7777;
     private static final String SERVER_URL = "http://localhost/api";
@@ -67,6 +73,12 @@ public class LoginEndpointTest {
             Account admin = new Account(true, "admin", "test", "1000adminPhone", "admin1");
             em.persist(user);
             em.persist(admin);
+
+            em.createNamedQuery("Festival.deleteAllRows").executeUpdate();
+            em.persist(new Festival("test festival 1", "test city 1", LocalDate.now(), "1 days"));
+            em.persist(new Festival("test festival 2", "test city 2", LocalDate.now(), "7 days"));
+            LocalDate date = LocalDate.of(2020, 1, 8);
+            em.persist(new Festival("test festival 3", "test city 3", date, "3 days"));
             //System.out.println("Saved test data to database");
             em.getTransaction().commit();
         } finally {
@@ -94,23 +106,10 @@ public class LoginEndpointTest {
         securityToken = null;
     }
 
-    @Test
-    public void serverIsRunning() {
-        given().when().get("/info").then().statusCode(200);
-    }
+
 
     @Test
-    public void testRestNoAuthenticationRequired() {
-        given()
-                .contentType("application/json")
-                .when()
-                .get("/info/").then()
-                .statusCode(200)
-                .body("msg", equalTo("Hello anonymous"));
-    }
-
-    @Test
-    public void testRestForAdmin() {
+    public void testGetAllForAdmin() {
         login("admin", "test");
         System.out.println("logged in");
         given()
@@ -118,57 +117,21 @@ public class LoginEndpointTest {
                 .accept(ContentType.JSON)
                 .header("x-access-token", securityToken)
                 .when()
-                .get("/info/admin").then()
-                .statusCode(200)
-                .body("msg", equalTo("Hello to (admin) User: admin"));
+                .get("/festival/get").then()
+                .statusCode(200);
     }
 
     @Test
-    public void testRestForUser() {
+    public void testGetAllRelevantForGuest() {
         login("user", "test");
+        System.out.println("logged in");
         given()
                 .contentType("application/json")
+                .accept(ContentType.JSON)
                 .header("x-access-token", securityToken)
                 .when()
-                .get("/info/user").then()
-                .statusCode(200)
-                .body("msg", equalTo("Hello to User: user"));
-    }
-
-    @Test
-    public void testAutorizedUserCannotAccesAdminPage() {
-        login("user", "test");
-        given()
-                .contentType("application/json")
-                .header("x-access-token", securityToken)
-                .when()
-                .get("/info/admin").then() //Call Admin endpoint as user
-                .statusCode(401);
-    }
-
-
-    @Test
-    public void userNotAuthenticated() {
-        logOut();
-        given()
-                .contentType("application/json")
-                .when()
-                .get("/info/user").then()
-                .statusCode(403)
-                .body("code", equalTo(403))
-                .body("message", equalTo("Not authenticated - do login"));
-    }
-
-    @Test
-    public void adminNotAuthenticated() {
-        logOut();
-        given()
-                .contentType("application/json")
-                .when()
-                .get("/info/user").then()
-                .statusCode(403)
-                .body("code", equalTo(403))
-                .body("message", equalTo("Not authenticated - do login"));
+                .get("/festival/getRelevant").then()
+                .statusCode(200);
     }
 
 }

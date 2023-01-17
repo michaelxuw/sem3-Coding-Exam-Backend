@@ -1,15 +1,14 @@
 package rest;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import dtos.FestivalDTO;
 import errorhandling.API_Exception;
 import errorhandling.GenericExceptionMapper;
 import facades.FestivalFacade;
 import security.Permission;
 import utils.EMF_Creator;
+import utils.GsonLocalDate;
 import utils.GsonLocalDateTime;
 
 import javax.annotation.security.PermitAll;
@@ -22,9 +21,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,7 +37,8 @@ import java.util.logging.Logger;
 public class FestivalResource {
     private static final EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();
     public static final FestivalFacade FESTIVAL_FACADE = FestivalFacade.getFestivalFacade(EMF);
-    private static final Gson GSON = new GsonBuilder().registerTypeAdapter(LocalDateTime.class, new GsonLocalDateTime()).setPrettyPrinting().create();
+    //private static final Gson GSON = new GsonBuilder().registerTypeAdapter(LocalDateTime.class, new GsonLocalDateTime()).setPrettyPrinting().create();
+    private static final Gson GSON = new GsonBuilder().registerTypeAdapter(LocalDate.class, new GsonLocalDate()).setPrettyPrinting().create();
 
 
 
@@ -48,7 +50,6 @@ public class FestivalResource {
     public Response createNewFestival(String content) throws API_Exception {
         String name, city;
         String startDate, duration;
-
         try {
             JsonObject json = JsonParser.parseString(content).getAsJsonObject();
             name = json.get("name").getAsString();
@@ -62,19 +63,22 @@ public class FestivalResource {
 
         try {
             FestivalDTO festival = FESTIVAL_FACADE.createFestival(name, city, LocalDate.parse(startDate), duration);
+            System.out.println("StartDate for created festival is: "+festival.getStartDate());
             return Response.ok(GSON.toJson(festival)).build();
 
         } catch (Exception ex) {
             Logger.getLogger(GenericExceptionMapper.class.getName()).log(Level.SEVERE, null, ex);
         }
-        throw new API_Exception("Failed to create a new FoocleSpot!");
+        throw new API_Exception("Failed to create a new Festival!");
     }
+
     @GET
     @Path("/get")
     @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllFestivals() {
         List<FestivalDTO> list = FESTIVAL_FACADE.getAllFestivals();
+        System.out.println("StartDate is: "+list.get(0).getStartDate());
         return Response.ok().entity(GSON.toJson(list)).header(MediaType.CHARSET_PARAMETER, StandardCharsets.UTF_8.name()).build();
     }
     @GET
@@ -84,6 +88,48 @@ public class FestivalResource {
     public Response getAllRelevantFestivals() {
         List<FestivalDTO> list = FESTIVAL_FACADE.getAllRelevantFestivals();
         return Response.ok().entity(GSON.toJson(list)).header(MediaType.CHARSET_PARAMETER, StandardCharsets.UTF_8.name()).build();
+    }
+
+    @PUT
+    @Path("{id}")
+    @PermitAll
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response update( @PathParam("id") Integer id, String content) throws API_Exception {
+        String name, city;
+        String startDate, duration;
+        Integer guest;
+        List<Integer> guests;
+        try {
+            JsonObject json = JsonParser.parseString(content).getAsJsonObject();
+            name = json.get("name").getAsString();
+            city = json.get("city").getAsString();
+            startDate = json.get("startDate").getAsString();
+            duration = json.get("duration").getAsString();
+            guest = json.get("guest").getAsInt();
+            Type listType = new TypeToken<LinkedList<Integer>>() {}.getType();
+            guests = new Gson().fromJson(json.get("guests").getAsJsonArray(), listType);
+
+        } catch (Exception e) {
+            throw new API_Exception("Malformed JSON Supplied",400,e);
+        }
+
+        try {
+            FESTIVAL_FACADE.updateFestival(id, name, city, LocalDate.parse(startDate), duration, guest, guests);
+            return Response.ok().build();
+
+        } catch (Exception ex) {
+            Logger.getLogger(GenericExceptionMapper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        throw new API_Exception("Failed to update Festival!");
+    }
+
+    @DELETE
+    @Path("/{id}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response delete(@PathParam("id") Integer id) {
+        FESTIVAL_FACADE.deleteFestival(id);
+        return Response.ok().build();
     }
 
 

@@ -5,9 +5,11 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
+@NamedQuery(name = "Festival.deleteAllRows", query = "DELETE from Festival")
 public class Festival {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,6 +48,12 @@ public class Festival {
         this.duration = duration;
     }
 
+    public void addGuest(Guest guest) {
+        guests.add(guest);
+    }
+    public void addGuests(List<Guest> guests) {
+        guests.addAll(guests);
+    }
 
 
     public Integer getId() {
