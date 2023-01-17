@@ -7,9 +7,11 @@ import entities.Guest;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class GuestFacade {
 
@@ -60,62 +62,55 @@ public class GuestFacade {
         }
         executeInsideTransaction(em -> {
             em.persist(guest);
-            account.setGuest(guest);
-            em.merge(account);
+            if (account != null) {
+                account.setGuest(guest);
+                em.merge(account);
+            }
         });
         return new GuestDTO(guest);
     }
 
 
-    public void updateGuest(Integer id, String name, String city, LocalDate startDate, String duration, Integer guestID, List<Integer> guestIDs){
-        List<Festival> festivals = executeWithClose((em) -> {
-            TypedQuery<Festival> query = em.createQuery("SELECT n FROM Festival n WHERE n.id = :id", Festival.class);
-            query.setParameter("id", id);
-            return query.getResultList();
-        });
-        if(festivals.isEmpty()) throw new EntityNotFoundException("Could not find the Festival!");
-
+    public void updateGuest(Integer id, String name, String phone, String email, String status, Integer accountID){
         Guest guest = executeWithClose((em) -> {
-            return em.find(Guest.class, guestID);
+            return em.find(Guest.class, id);
         });
-//        List<Guest> guest = executeWithClose((em) -> {
-//            TypedQuery<Guest> query = em.createQuery("SELECT n FROM Guest n WHERE n.id = :guestID", Guest.class);
-//            query.setParameter("guestID", guestID);
-//            return query.getResultList();
-//        });
-        List<Guest> guests = executeWithClose((em) -> {
-            TypedQuery<Guest> query = em.createQuery("SELECT n FROM Guest n WHERE n.id in :guestIDs", Guest.class);
-            query.setParameter("guestIDs", guestIDs);
-            return query.getResultList();
-//            List<Guest> foundGuests = new LinkedList<Guest>();
-//            for (Integer i : guestIDs) {
-//                TypedQuery<Guest> query = em.createQuery("SELECT n FROM Guest n WHERE n.id in :guestID", Guest.class);
-//                query.setParameter("guestID", guestIDs);
-//                foundGuests.add(query.getResultList().get(0));
-//            }
-//            return foundGuests;
-        });
+        if(guest == null) throw new EntityNotFoundException("Could not find the Guest!");
 
-        Festival festival = festivals.get(0);
-        festival.setName(name);
-        festival.setCity(city);
-        festival.setStartDate(startDate);
-        festival.setDuration(duration);
-        if(guest != null) {
-            festival.addGuest(guest);
-        }
-        if(guests != null || !guests.isEmpty()) {
-            festival.addGuests(guests);
+        Account account = executeWithClose((em) -> {
+            return em.find(Account.class, accountID);
+        });
+        if(account == null) throw new EntityNotFoundException("Could not find the Account!");
+
+        guest.setName(name);
+        guest.setPhone(phone);
+        guest.setEmail(email);
+        guest.setStatus(status);
+        if (account != null) {
+            guest.setAccount(account);
         }
 
         executeInsideTransaction((em) -> {
-            em.merge(festival);
+            em.merge(guest);
+            if (account != null) {
+                account.setGuest(guest);
+                em.merge(account);
+            }
         });
     }
     public void deleteGuest(Integer id) throws EntityNotFoundException{
         executeInsideTransaction(em -> {
-            Festival festival = em.find(Festival.class, id);
-            em.remove(festival);
+            Guest guest = em.find(Guest.class, id);
+
+            TypedQuery<Account> query = em.createQuery("SELECT n FROM Account n WHERE n.guest.id = :id", Account.class);
+            query.setParameter("id", id);
+            Account account = query.getSingleResult();
+
+            if(account != null) {
+                account.setGuest(null);
+                em.merge(account);
+            }
+            em.remove(guest);
         });
     }
 

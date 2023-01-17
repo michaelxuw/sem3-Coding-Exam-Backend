@@ -45,7 +45,7 @@ public class GuestResource {
     @RolesAllowed({Permission.Types.ADMIN})
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/")
+    @Path("/new")
     public Response createNewGuest(String content) throws API_Exception {
         String name, phone, email, status;
         Integer accountID;
@@ -56,7 +56,6 @@ public class GuestResource {
             email = json.get("email").getAsString();
             status = json.get("status").getAsString();
             accountID = json.get("accountID").getAsInt();
-
         } catch (Exception e) {
             throw new API_Exception("Malformed JSON Supplied",400,e);
         }
@@ -72,7 +71,7 @@ public class GuestResource {
     }
 
     @GET
-    @Path("/")
+    @Path("/get")
     @RolesAllowed({Permission.Types.ADMIN})
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllGuests() {
@@ -88,49 +87,42 @@ public class GuestResource {
         return Response.ok().entity(GSON.toJson(guest)).header(MediaType.CHARSET_PARAMETER, StandardCharsets.UTF_8.name()).build();
     }
 
+    @PUT
+    @Path("/{id}")
+    @RolesAllowed({Permission.Types.ADMIN})
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response update( @PathParam("id") Integer id, String content) throws API_Exception {
+        String name, phone, email, status;
+        Integer accountID;
+        try {
+            JsonObject json = JsonParser.parseString(content).getAsJsonObject();
+            name = json.get("name").getAsString();
+            phone = json.get("phone").getAsString();
+            email = json.get("email").getAsString();
+            status = json.get("status").getAsString();
+            accountID = json.get("accountID").getAsInt();
+        } catch (Exception e) {
+            throw new API_Exception("Malformed JSON Supplied",400,e);
+        }
 
-//    @PUT
-//    @Path("/{id}")
-//    @RolesAllowed({Permission.Types.ADMIN})
-//    @Produces({MediaType.APPLICATION_JSON})
-//    @Consumes({MediaType.APPLICATION_JSON})
-//    public Response update(@PathParam("id") Integer id, String content) throws API_Exception {
-//        String name, city;
-//        String startDate, duration;
-//        Integer guest;
-//        List<Integer> guests;
-//        try {
-//            JsonObject json = JsonParser.parseString(content).getAsJsonObject();
-//            name = json.get("name").getAsString();
-//            city = json.get("city").getAsString();
-//            startDate = json.get("startDate").getAsString();
-//            duration = json.get("duration").getAsString();
-//            guest = json.get("guest").getAsInt();
-//            Type listType = new TypeToken<LinkedList<Integer>>() {}.getType();
-//            guests = new Gson().fromJson(json.get("guests").getAsJsonArray(), listType);
-//
-//        } catch (Exception e) {
-//            throw new API_Exception("Malformed JSON Supplied",400,e);
-//        }
-//
-//        try {
-//            FESTIVAL_FACADE.updateFestival(id, name, city, LocalDate.parse(startDate), duration, guest, guests);
-//            return Response.ok().build();
-//
-//        } catch (Exception ex) {
-//            Logger.getLogger(GenericExceptionMapper.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        throw new API_Exception("Failed to update Festival!");
-//    }
-//
-//    @DELETE
-//    @Path("/{id}")
-//    @RolesAllowed({Permission.Types.ADMIN})
-//    @Produces({MediaType.APPLICATION_JSON})
-//    public Response delete(@PathParam("id") Integer id) {
-//        FESTIVAL_FACADE.deleteFestival(id);
-//        return Response.ok().build();
-//    }
+        try {
+            GUEST_FACADE.updateGuest(id, name, phone, email, status, accountID);
+            return Response.ok().entity(GSON.toJson("Updated Guest with ID: "+id)).header(MediaType.CHARSET_PARAMETER, StandardCharsets.UTF_8.name()).build();
+        } catch (Exception ex) {
+            Logger.getLogger(GenericExceptionMapper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        throw new API_Exception("Failed to update Guest!");
+    }
+
+    @DELETE
+    @Path("/{id}")
+    @RolesAllowed({Permission.Types.ADMIN})
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response delete(@PathParam("id") Integer id) {
+        GUEST_FACADE.deleteGuest(id);
+        return Response.ok().entity(GSON.toJson("Deleted Guest with ID: "+id)).header(MediaType.CHARSET_PARAMETER, StandardCharsets.UTF_8.name()).build();
+    }
 
 
 }

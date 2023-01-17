@@ -101,7 +101,6 @@ public class FestivalFacade {
                 }
             }
         });
-
     }
     public void deleteFestival(Integer id) throws EntityNotFoundException{
         executeInsideTransaction(em -> {
