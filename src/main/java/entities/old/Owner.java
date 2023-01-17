@@ -1,4 +1,6 @@
-package entities;
+package entities.old;
+
+import entities.old.Boat;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -7,10 +9,10 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
-public class Harbour {
+public class Owner {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "harbour_ID", nullable = false)
+    @Column(name = "owner_ID", nullable = false)
     private Integer id;
 
     @Size(max = 45)
@@ -25,10 +27,11 @@ public class Harbour {
 
     @Size(max = 45)
     @NotNull
-    @Column(name = "capacity", nullable = false, length = 45)
-    private String capacity;
+    @Column(name = "phone", nullable = false, length = 45)
+    private String phone;
 
-    @OneToMany(mappedBy = "harbour")
+    @ManyToMany
+    @JoinTable(name = "Boat_has_Owner", joinColumns = @JoinColumn(name = "owner_ID"), inverseJoinColumns = @JoinColumn(name = "boat_ID"))
     private Set<Boat> boats = new LinkedHashSet<>();
 
     public Integer getId() {
@@ -55,12 +58,12 @@ public class Harbour {
         this.address = address;
     }
 
-    public String getCapacity() {
-        return capacity;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setCapacity(String capacity) {
-        this.capacity = capacity;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public Set<Boat> getBoats() {

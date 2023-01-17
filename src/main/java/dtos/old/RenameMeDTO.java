@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package dtos;
+package dtos.old;
 
-import entities.RenameMe;
+import entities.old.RenameMe;
 import java.util.ArrayList;
 import java.util.List;
 

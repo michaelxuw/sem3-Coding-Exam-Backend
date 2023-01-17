@@ -37,6 +37,20 @@ public class Account {
     @Column(name = "name", nullable = false, length = 45)
     private String name;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "guest_ID")
+    private Guest guest;
+
+
+
+    public Guest getGuest() {
+        return guest;
+    }
+
+    public void setGuest(Guest guest) {
+        this.guest = guest;
+    }
+
 
     public Account() {}
 
@@ -64,7 +78,6 @@ public class Account {
     public Integer getId() {
         return id;
     }
-
     public void setId(Integer id) {
         this.id = id;
     }
@@ -72,7 +85,6 @@ public class Account {
     public boolean getIsAdmin() {
         return isAdmin;
     }
-
     public void setIsAdmin(boolean isAdmin) {
         this.isAdmin = isAdmin;
     }
@@ -80,7 +92,6 @@ public class Account {
     public String getEmail() {
         return email;
     }
-
     public void setEmail(String email) {
         this.email = email;
     }
@@ -88,7 +99,6 @@ public class Account {
     public String getPassword() {
         return password;
     }
-
     public void setPassword(String password) {
         this.password = password;
     }
@@ -96,7 +106,6 @@ public class Account {
     public String getPhone() {
         return phone;
     }
-
     public void setPhone(String phone) {
         this.phone = phone;
     }
@@ -104,9 +113,16 @@ public class Account {
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
+    }
+
 
 }

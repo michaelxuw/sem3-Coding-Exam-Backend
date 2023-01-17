@@ -1,9 +1,6 @@
 package rest;
 
-import entities.Role;
-import entities.User;
 import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import io.restassured.parsing.Parser;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
@@ -11,14 +8,11 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.jupiter.api.*;
 import utils.EMF_Creator;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @Disabled
 class api1ResourceTest {

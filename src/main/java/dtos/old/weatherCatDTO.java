@@ -1,4 +1,4 @@
-package dtos;
+package dtos.old;
 
 public class weatherCatDTO {
 

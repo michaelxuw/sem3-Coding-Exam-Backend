@@ -2,9 +2,9 @@ package rest;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import dtos.catDTO;
-import dtos.weatherCatDTO;
-import dtos.weatherDTO;
+import dtos.old.catDTO;
+import dtos.old.weatherCatDTO;
+import dtos.old.weatherDTO;
 import utils.HttpUtils;
 
 import javax.ws.rs.*;
@@ -13,7 +13,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
-import java.util.HashMap;
 
 /**
  * @author lam@cphbusiness.dk

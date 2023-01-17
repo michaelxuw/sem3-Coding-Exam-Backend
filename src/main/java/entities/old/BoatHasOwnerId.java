@@ -1,4 +1,4 @@
-package entities;
+package entities.old;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;

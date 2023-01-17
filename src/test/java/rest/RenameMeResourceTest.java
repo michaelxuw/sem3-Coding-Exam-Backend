@@ -1,6 +1,6 @@
 package rest;
 
-import entities.RenameMe;
+import entities.old.RenameMe;
 import utils.EMF_Creator;
 import io.restassured.RestAssured;
 import static io.restassured.RestAssured.given;
