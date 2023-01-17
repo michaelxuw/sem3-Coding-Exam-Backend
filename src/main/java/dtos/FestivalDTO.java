@@ -2,7 +2,7 @@ package dtos;
 
 import entities.Festival;
 import entities.Guest;
-import java.time.Instant;
+
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -80,6 +80,8 @@ public class FestivalDTO {
         this.guestIDs = guestIDs;
     }
 
-
-
+    @Override
+    public String toString() {
+        return "FestivalDTO{" + "id=" + id + ", name='" + name + '\'' + ", city='" + city + '\'' + ", startDate=" + startDate + ", duration='" + duration + '\'' + ", guestIDs=" + guestIDs + '}';
+    }
 }

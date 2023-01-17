@@ -3,15 +3,14 @@ package facades;
 import dtos.FestivalDTO;
 import entities.Festival;
 import entities.Guest;
-import security.errorhandling.AuthenticationException;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class FestivalFacade {
 
@@ -63,58 +62,62 @@ public class FestivalFacade {
     }
 
 
-    public void updateFestival(Integer id, String name, String city, LocalDate startDate, String duration, Integer guestID, List<Integer> guestIDs){
-        List<Festival> festivals = executeWithClose((em) -> {
-            TypedQuery<Festival> query = em.createQuery("SELECT n FROM Festival n WHERE n.id = :id", Festival.class);
-            query.setParameter("id", id);
-            return query.getResultList();
+    public void updateFestival(Integer id, String name, String city, LocalDate startDate, String duration, List<Integer> guestIDs){
+        Festival festival = executeWithClose((em) -> {
+            return em.find(Festival.class, id);
         });
-        if(festivals.isEmpty()) throw new EntityNotFoundException("Could not find the Festival!");
-        List<Guest> guest = executeWithClose((em) -> {
-            TypedQuery<Guest> query = em.createQuery("SELECT n FROM Guest n WHERE n.id = :guestID", Guest.class);
-            query.setParameter("guestID", guestID);
-            return query.getResultList();
-        });
-        List<Guest> guests = executeWithClose((em) -> {
-            TypedQuery<Guest> query = em.createQuery("SELECT n FROM Guest n WHERE n.id in :guestIDs", Guest.class);
-            query.setParameter("guestIDs", guestIDs);
-            return query.getResultList();
+        if(festival == null) throw new EntityNotFoundException("Could not find the Festival!");
 
-//            List<Guest> foundGuests = new LinkedList<Guest>();
-//            for (Integer i : guestIDs) {
-//                TypedQuery<Guest> query = em.createQuery("SELECT n FROM Guest n WHERE n.id in :guestID", Guest.class);
-//                query.setParameter("guestID", guestIDs);
-//                foundGuests.add(query.getResultList().get(0));
-//            }
-//            return foundGuests;
-        });
+//        System.out.println("Festival is: "+festival);
 
-        Festival festival = festivals.get(0);
+        List<Guest> guests;
+        if(guestIDs.size() != 0) {
+            guests = executeWithClose((em) -> {
+                TypedQuery<Guest> query = em.createQuery("SELECT n FROM Guest n WHERE n.id IN :guestIDs", Guest.class);
+                query.setParameter("guestIDs", guestIDs.stream().map(integer -> integer.toString()).collect(Collectors.toList()));
+                return query.getResultList();
+            });
+        } else {
+            guests = new ArrayList<>();
+        }
+
         festival.setName(name);
         festival.setCity(city);
         festival.setStartDate(startDate);
         festival.setDuration(duration);
-        if(guest != null || !guest.isEmpty()) {
-            festival.addGuest(guest.get(0));
-        }
-        if(guests != null || !guests.isEmpty()) {
-            festival.addGuests(guests);
-        }
+
+//        System.out.println("Festival is: "+festival);
+
 
         executeInsideTransaction((em) -> {
             em.merge(festival);
+
+            if (!guests.isEmpty()) {
+                festival.addGuests(guests);
+                em.merge(festival);
+                for (Guest guest : guests) {
+                    guest.setFestival(festival);
+                    em.merge(guest);
+                }
+            }
         });
+
     }
     public void deleteFestival(Integer id) throws EntityNotFoundException{
-        List<Festival> festivals = executeWithClose((em) -> {
-            TypedQuery<Festival> query = em.createQuery("SELECT n FROM Festival n WHERE n.id = :id", Festival.class);
-            query.setParameter("id", id);
-            return query.getResultList();
-        });
-        if(festivals.isEmpty()) throw new EntityNotFoundException("Could not find the notification!");
-
         executeInsideTransaction(em -> {
-            Festival festival = em.find(Festival.class, festivals.get(0));
+            Festival festival = em.find(Festival.class, id);
+
+            TypedQuery<Guest> query = em.createQuery("SELECT n FROM Guest n WHERE n.festival.id = :festivalID", Guest.class);
+            query.setParameter("festivalID", id);
+            List<Guest> guests = query.getResultList();
+
+            if(!guests.isEmpty()) {
+                for (Guest guest : guests) {
+                    guest.setFestival(null);
+                    em.merge(guest);
+                }
+            }
+
             em.remove(festival);
         });
     }

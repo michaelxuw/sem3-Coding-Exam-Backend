@@ -4,14 +4,22 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
+@NamedQuery(name = "Guest.deleteAllRows", query = "DELETE from Guest")
+@Table(name = "GUEST")
 public class Guest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "guest_ID", nullable = false)
     private Integer id;
+
+    @Size(max = 45)
+    @NotNull
+    @Column(name = "email", nullable = false, length = 45)
+    private String email;
 
     @Size(max = 45)
     @NotNull
@@ -24,25 +32,44 @@ public class Guest {
     private String phone;
 
     @Size(max = 45)
-    @NotNull
-    @Column(name = "email", nullable = false, length = 45)
-    private String email;
-
-    @Size(max = 45)
     @Column(name = "status", length = 45)
     private String status;
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "festival_ID", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "festival_ID")
     private Festival festival;
 
     @OneToOne(mappedBy = "guest")
-    private Account accounts;
+    private Account account;
 
-    @ManyToMany
-    @JoinTable(name = "Show_has_Guest", joinColumns = @JoinColumn(name = "guest_ID"), inverseJoinColumns = @JoinColumn(name = "show_ID"))
-    private Set<Show> shows = new LinkedHashSet<>();
+    @OneToMany(mappedBy = "guest")
+    private Set<ShowRegistration> showRegistrations = new LinkedHashSet<>();
+
+
+    public Guest() {
+    }
+    public Guest(String name, String phone, String email, String status) {
+        this.name = name;
+        this.phone = phone;
+        this.email = email;
+        this.status = status;
+    }
+    public Guest(String name, String phone, String email, String status, Account account) {
+        this.name = name;
+        this.phone = phone;
+        this.email = email;
+        this.status = status;
+        this.account = account;
+    }
+
+    public void addShowRegistration(ShowRegistration show) {
+        showRegistrations.add(show);
+    }
+    public void addShowRegistrations(List<ShowRegistration> shows) {
+        this.showRegistrations.addAll(shows);
+    }
+
+
 
     public Integer getId() {
         return id;
@@ -50,6 +77,14 @@ public class Guest {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getName() {
@@ -68,14 +103,6 @@ public class Guest {
         this.phone = phone;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getStatus() {
         return status;
     }
@@ -92,20 +119,20 @@ public class Guest {
         this.festival = festival;
     }
 
-    public Account getAccounts() {
-        return accounts;
+    public Account getAccount() {
+        return account;
     }
 
-    public void setAccounts(Account accounts) {
-        this.accounts = accounts;
+    public void setAccount(Account account) {
+        this.account = account;
     }
 
-    public Set<Show> getShows() {
-        return shows;
+    public Set<ShowRegistration> getShowRegistrations() {
+        return showRegistrations;
     }
 
-    public void setShows(Set<Show> shows) {
-        this.shows = shows;
+    public void setShowRegistrations(Set<ShowRegistration> showRegistrations) {
+        this.showRegistrations = showRegistrations;
     }
 
 }

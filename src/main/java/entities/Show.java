@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
+@NamedQuery(name = "Show.deleteAllRows", query = "DELETE from Show")
 @Table(name = "`Show`")
 public class Show {
     @Id
@@ -39,9 +40,8 @@ public class Show {
     @Column(name = "startTime", nullable = false, length = 45)
     private String startTime;
 
-    @ManyToMany
-    @JoinTable(name = "Show_has_Guest", joinColumns = @JoinColumn(name = "show_ID"), inverseJoinColumns = @JoinColumn(name = "guest_ID"))
-    private Set<Guest> guests = new LinkedHashSet<>();
+    @OneToMany(mappedBy = "show")
+    private Set<ShowRegistration> showRegistrations = new LinkedHashSet<>();
 
     public Integer getId() {
         return id;
@@ -91,12 +91,12 @@ public class Show {
         this.startTime = startTime;
     }
 
-    public Set<Guest> getGuests() {
-        return guests;
+    public Set<ShowRegistration> getShowRegistrations() {
+        return showRegistrations;
     }
 
-    public void setGuests(Set<Guest> guests) {
-        this.guests = guests;
+    public void setShowRegistrations(Set<ShowRegistration> showRegistrations) {
+        this.showRegistrations = showRegistrations;
     }
 
 }

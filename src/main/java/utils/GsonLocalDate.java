@@ -9,15 +9,18 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 public class GsonLocalDate implements JsonSerializer<LocalDate>, JsonDeserializer<LocalDate> {
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d-MMM-yyyy");
+//    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d-mmm-yyyy");
     @Override
     public LocalDate deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-        return LocalDate.parse(jsonElement.getAsString(),
-                DateTimeFormatter.ofPattern("d-MMM-yyyy").withLocale(Locale.ENGLISH));
+        String ldtString = jsonElement.getAsString();
+        return LocalDate.parse(ldtString, DateTimeFormatter.ISO_LOCAL_DATE);
+//        return LocalDate.parse(jsonElement.getAsString(),
+//                DateTimeFormatter.ofPattern("d-mmm-yyyy").withLocale(Locale.ENGLISH));
     }
 
     @Override
     public JsonElement serialize(LocalDate localDate, Type type, JsonSerializationContext jsonSerializationContext) {
-        return new JsonPrimitive(formatter.format(localDate));
+        return new JsonPrimitive(localDate.format(DateTimeFormatter.ISO_LOCAL_DATE));
+//        return new JsonPrimitive(formatter.format(localDate));
     }
 }

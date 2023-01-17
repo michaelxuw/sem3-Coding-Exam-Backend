@@ -61,7 +61,7 @@ public class LoginEndpointTest {
         try {
             em.getTransaction().begin();
             //Delete existing users and roles to get a "fresh" database
-            em.createQuery("delete from Account").executeUpdate();
+            em.createNamedQuery("Account.deleteAllRows").executeUpdate();
 
             Account user = new Account(false, "user", "test", "0001userPhone", "user1");
             Account admin = new Account(true, "admin", "test", "1000adminPhone", "admin1");

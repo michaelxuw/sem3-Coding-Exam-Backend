@@ -3,6 +3,7 @@ package entities;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -39,6 +40,8 @@ public class Festival {
     private Set<Guest> guests = new LinkedHashSet<>();
 
 
+
+
     public Festival() {
     }
     public Festival(String name, String city, LocalDate startDate, String duration) {
@@ -52,7 +55,7 @@ public class Festival {
         guests.add(guest);
     }
     public void addGuests(List<Guest> guests) {
-        guests.addAll(guests);
+        this.guests.addAll(guests);
     }
 
 

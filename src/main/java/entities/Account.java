@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
+@NamedQuery(name = "Account.deleteAllRows", query = "DELETE from Account")
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,15 +42,6 @@ public class Account {
     @JoinColumn(name = "guest_ID")
     private Guest guest;
 
-
-
-    public Guest getGuest() {
-        return guest;
-    }
-
-    public void setGuest(Guest guest) {
-        this.guest = guest;
-    }
 
 
     public Account() {}
@@ -122,6 +114,15 @@ public class Account {
     }
     public void setAdmin(boolean admin) {
         isAdmin = admin;
+    }
+
+
+    public Guest getGuest() {
+        return guest;
+    }
+
+    public void setGuest(Guest guest) {
+        this.guest = guest;
     }
 
 

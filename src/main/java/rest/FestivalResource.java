@@ -78,7 +78,7 @@ public class FestivalResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllFestivals() {
         List<FestivalDTO> list = FESTIVAL_FACADE.getAllFestivals();
-        System.out.println("StartDate is: "+list.get(0).getStartDate());
+//        System.out.println("GSON toJson is: "+GSON.toJson(list));
         return Response.ok().entity(GSON.toJson(list)).header(MediaType.CHARSET_PARAMETER, StandardCharsets.UTF_8.name()).build();
     }
     @GET
@@ -91,14 +91,13 @@ public class FestivalResource {
     }
 
     @PUT
-    @Path("{id}")
-    @PermitAll
+    @Path("/{id}")
+    @RolesAllowed({Permission.Types.ADMIN})
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
     public Response update( @PathParam("id") Integer id, String content) throws API_Exception {
         String name, city;
         String startDate, duration;
-        Integer guest;
         List<Integer> guests;
         try {
             JsonObject json = JsonParser.parseString(content).getAsJsonObject();
@@ -106,17 +105,17 @@ public class FestivalResource {
             city = json.get("city").getAsString();
             startDate = json.get("startDate").getAsString();
             duration = json.get("duration").getAsString();
-            guest = json.get("guest").getAsInt();
             Type listType = new TypeToken<LinkedList<Integer>>() {}.getType();
-            guests = new Gson().fromJson(json.get("guests").getAsJsonArray(), listType);
+            guests = new Gson().fromJson(json.get("guestIDs").getAsJsonArray(), listType);
 
         } catch (Exception e) {
             throw new API_Exception("Malformed JSON Supplied",400,e);
         }
 
         try {
-            FESTIVAL_FACADE.updateFestival(id, name, city, LocalDate.parse(startDate), duration, guest, guests);
-            return Response.ok().build();
+            System.out.println("Duration is: "+duration);
+            FESTIVAL_FACADE.updateFestival(id, name, city, LocalDate.parse(startDate), duration, guests);
+            return Response.ok().entity(GSON.toJson("Updated Festival with ID: "+id)).header(MediaType.CHARSET_PARAMETER, StandardCharsets.UTF_8.name()).build();
 
         } catch (Exception ex) {
             Logger.getLogger(GenericExceptionMapper.class.getName()).log(Level.SEVERE, null, ex);
@@ -126,10 +125,11 @@ public class FestivalResource {
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed({Permission.Types.ADMIN})
     @Produces({MediaType.APPLICATION_JSON})
     public Response delete(@PathParam("id") Integer id) {
         FESTIVAL_FACADE.deleteFestival(id);
-        return Response.ok().build();
+        return Response.ok().entity(GSON.toJson("Deleted Festival with ID: "+id)).header(MediaType.CHARSET_PARAMETER, StandardCharsets.UTF_8.name()).build();
     }
 
 
