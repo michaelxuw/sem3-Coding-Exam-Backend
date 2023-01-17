@@ -4,7 +4,9 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -33,7 +35,7 @@ public class Show {
 
     @NotNull
     @Column(name = "startDate", nullable = false)
-    private Instant startDate;
+    private LocalDate startDate;
 
     @Size(max = 45)
     @NotNull
@@ -42,6 +44,34 @@ public class Show {
 
     @OneToMany(mappedBy = "show")
     private Set<ShowRegistration> showRegistrations = new LinkedHashSet<>();
+
+
+
+    public Show() {
+    }
+    public Show(Integer id, String name, String duration, String location, LocalDate startDate, String startTime) {
+        this.id = id;
+        this.name = name;
+        this.duration = duration;
+        this.location = location;
+        this.startDate = startDate;
+        this.startTime = startTime;
+    }
+    public Show(String name, String duration, String location, LocalDate startDate, String startTime) {
+        this.name = name;
+        this.duration = duration;
+        this.location = location;
+        this.startDate = startDate;
+        this.startTime = startTime;
+    }
+
+    public void addShowRegistration(ShowRegistration show) {
+        showRegistrations.add(show);
+    }
+    public void addShowRegistrations(List<ShowRegistration> shows) {
+        this.showRegistrations.addAll(shows);
+    }
+
 
     public Integer getId() {
         return id;
@@ -75,11 +105,11 @@ public class Show {
         this.location = location;
     }
 
-    public Instant getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Instant startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 

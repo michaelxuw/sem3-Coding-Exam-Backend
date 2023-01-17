@@ -21,6 +21,16 @@ public class ShowRegistration {
     @JoinColumn(name = "guest_ID", nullable = false)
     private Guest guest;
 
+
+
+    public ShowRegistration(){}
+    public ShowRegistration(Show show, Guest guest){
+        this.show = show;
+        this.guest = guest;
+    }
+
+
+
     public Integer getId() {
         return id;
     }

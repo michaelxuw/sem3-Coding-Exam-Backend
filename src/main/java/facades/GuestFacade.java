@@ -98,6 +98,7 @@ public class GuestFacade {
             }
         });
     }
+
     public void deleteGuest(Integer id) throws EntityNotFoundException{
         executeInsideTransaction(em -> {
             Guest guest = em.find(Guest.class, id);

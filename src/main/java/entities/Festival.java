@@ -41,7 +41,6 @@ public class Festival {
 
 
 
-
     public Festival() {
     }
     public Festival(String name, String city, LocalDate startDate, String duration) {
