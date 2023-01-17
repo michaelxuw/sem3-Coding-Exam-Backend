@@ -8,6 +8,7 @@ import javax.validation.constraints.NotNull;
 @Table(name = "Show_Registration")
 public class ShowRegistration {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "show_registration_ID", nullable = false)
     private Integer id;
 
