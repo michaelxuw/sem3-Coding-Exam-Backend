@@ -95,7 +95,7 @@ public class ShowResource {
 
     @PUT
     @Path("/{showId}/{guestID}")
-    @RolesAllowed({Permission.Types.ADMIN})
+    @RolesAllowed({Permission.Types.USER})
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
     public Response signUpToShow( @PathParam("showId") Integer showId, @PathParam("guestID") Integer guestID) throws API_Exception {
