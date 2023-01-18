@@ -83,7 +83,7 @@ public class FestivalResource {
     }
     @GET
     @Path("/getRelevant")
-    @PermitAll
+//    @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllRelevantFestivals() {
         List<FestivalDTO> list = FESTIVAL_FACADE.getAllRelevantFestivals();
