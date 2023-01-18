@@ -10,9 +10,11 @@ import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import dtos.FestivalDTO;
 import entities.Account;
 import facades.AccountFacade;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,6 +43,32 @@ public class LoginEndpoint {
     @Context
     SecurityContext securityContext;
 
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/new")
+    public Response createAccount(String content) throws API_Exception {
+        boolean isAdmin;
+        String email, userPass, phone, name;
+        try {
+            JsonObject json = JsonParser.parseString(content).getAsJsonObject();
+            isAdmin = json.get("isAdmin").getAsBoolean();
+            email = json.get("email").getAsString();
+            userPass = json.get("password").getAsString();
+            phone = json.get("phone").getAsString();
+            name = json.get("name").getAsString();
+        } catch (Exception e) {
+            throw new API_Exception("Malformed JSON Supplied",400,e);
+        }
+        try {
+            Account account = ACCOUNT_FACADE.createAccount(isAdmin, email, userPass, phone, name);
+            Response.ok().build();
+
+        } catch (Exception ex) {
+            Logger.getLogger(GenericExceptionMapper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        throw new API_Exception("Failed to create a new Account!");
+    }
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
